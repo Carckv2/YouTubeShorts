@@ -1,0 +1,6 @@
+
+yt-dlp
+openai-whisper
+moviepy
+openai
+python-telegram-bot==13.14
