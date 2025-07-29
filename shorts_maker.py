@@ -2,11 +2,25 @@ import os
 import ffmpeg
 from pytube import YouTube
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
+from urllib.parse import urlparse, parse_qs
 
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+def clean_youtube_url(url: str) -> str:
+    parsed = urlparse(url)
+    if parsed.netloc in ['youtu.be']:
+        video_id = parsed.path.lstrip('/')
+        return f"https://www.youtube.com/watch?v={video_id}"
+    elif 'youtube.com' in parsed.netloc:
+        qs = parse_qs(parsed.query)
+        vid = qs.get('v')
+        if vid:
+            return f"https://www.youtube.com/watch?v={vid[0]}"
+    return url
+
 def download_youtube_video(url: str):
+    url = clean_youtube_url(url)
     yt = YouTube(url)
     title = yt.title.replace(" ", "_").replace("/", "_")
     description = yt.description.strip().replace("\n", " ")
