@@ -33,8 +33,10 @@ def download_youtube_video(url: str):
         info = ydl.extract_info(url, download=True)
         title = info.get('title', 'video').replace(" ", "_").replace("/", "_")
         description = info.get('description', '').replace('\n', ' ').strip()
-        filepath = os.path.join(OUTPUT_DIR, f"{title}.mp4")
-    
+        # get exact downloaded file path from yt-dlp
+        filepath = ydl.prepare_filename(info)
+        filepath = os.path.abspath(filepath)
+
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"Downloaded file not found: {filepath}")
     return filepath, title, description
