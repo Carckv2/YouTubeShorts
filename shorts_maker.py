@@ -1,18 +1,18 @@
 import os
 import ffmpeg
-from pytube import YouTube
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 from urllib.parse import urlparse, parse_qs
+import yt_dlp
 
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def clean_youtube_url(url: str) -> str:
     parsed = urlparse(url)
-    if parsed.netloc in ['youtu.be']:
+    if parsed.netloc == "youtu.be":
         video_id = parsed.path.lstrip('/')
         return f"https://www.youtube.com/watch?v={video_id}"
-    elif 'youtube.com' in parsed.netloc:
+    elif "youtube.com" in parsed.netloc:
         qs = parse_qs(parsed.query)
         vid = qs.get('v')
         if vid:
@@ -21,13 +21,22 @@ def clean_youtube_url(url: str) -> str:
 
 def download_youtube_video(url: str):
     url = clean_youtube_url(url)
-    yt = YouTube(url)
-    title = yt.title.replace(" ", "_").replace("/", "_")
-    description = yt.description.strip().replace("\n", " ")
-    stream = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
-    filepath = os.path.join(OUTPUT_DIR, f"{title}.mp4")
+    ydl_opts = {
+        'format': 'mp4[ext=mp4]+bestaudio/best',
+        'outtmpl': os.path.join(OUTPUT_DIR, '%(title)s.%(ext)s'),
+        'noplaylist': True,
+        'quiet': True,
+        'no_warnings': True,
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=True)
+        title = info.get('title', 'video').replace(" ", "_").replace("/", "_")
+        description = info.get('description', '').replace('\n', ' ').strip()
+        filepath = os.path.join(OUTPUT_DIR, f"{title}.mp4")
+    
     if not os.path.exists(filepath):
-        stream.download(output_path=OUTPUT_DIR, filename=f"{title}.mp4")
+        raise FileNotFoundError(f"Downloaded file not found: {filepath}")
     return filepath, title, description
 
 def create_caption_clips(title: str, description: str, video_width: int, video_height: int):
