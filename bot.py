@@ -1,3 +1,4 @@
+import traceback
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -31,7 +32,8 @@ async def shorts_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_video(video=video_file, caption="✅ Here is your Shorts video!")
     except Exception as e:
         logging.error(f"Error processing video: {e}")
-        await update.message.reply_text("❌ Failed to generate Shorts. Please try again later.")
+        logging.error(traceback.format_exc())
+        await update.message.reply_text(f"❌ Failed to generate Shorts.\nError:\n{e}\nPlease try again later.")
 
 if __name__ == "__main__":
     app = ApplicationBuilder().token(BOT_TOKEN).build()
