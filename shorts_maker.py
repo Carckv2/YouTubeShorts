@@ -110,6 +110,11 @@ def generate_shorts(url: str):
     print(f"[DEBUG] Video downloaded: {video_path}")
     captioned_path = burn_captions(video_path, title, description)
     print(f"[DEBUG] Captioned video created: {captioned_path}")
-    shorts_path = convert_to_vertical(captioned_path, title)
-    print(f"[DEBUG] Shorts video created: {shorts_path}")
-    return shorts_path
+    vertical_path = convert_to_vertical(captioned_path, title)
+    print(f"[DEBUG] Shorts video created: {vertical_path}")
+
+    compressed_path = vertical_path.replace(".mp4", "_compressed.mp4")
+    compress_video(vertical_path, compressed_path)
+    print(f"[DEBUG] Compressed video created: {compressed_path}")
+
+    return compressed_path
