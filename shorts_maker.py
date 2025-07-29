@@ -89,6 +89,21 @@ def convert_to_vertical(input_path: str, title: str):
     )
     return output_path
 
+def compress_video(input_path: str, output_path: str):
+    import subprocess
+    compress_cmd = [
+        'ffmpeg',
+        '-i', input_path,
+        '-vcodec', 'libx264',
+        '-preset', 'slow',
+        '-crf', '28',
+        '-acodec', 'aac',
+        '-b:a', '128k',
+        '-y',  # Overwrite output
+        output_path
+    ]
+    subprocess.run(compress_cmd, check=True)
+    
 def generate_shorts(url: str):
     print(f"[DEBUG] Starting shorts generation for URL: {url}")
     video_path, title, description = download_youtube_video(url)
