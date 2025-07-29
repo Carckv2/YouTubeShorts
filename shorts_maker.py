@@ -64,7 +64,11 @@ def convert_to_vertical(input_path: str, title: str):
     return output_path
 
 def generate_shorts(url: str):
+    print(f"[DEBUG] Starting shorts generation for URL: {url}")
     video_path, title, description = download_youtube_video(url)
+    print(f"[DEBUG] Video downloaded: {video_path}")
     captioned_path = burn_captions(video_path, title, description)
+    print(f"[DEBUG] Captioned video created: {captioned_path}")
     shorts_path = convert_to_vertical(captioned_path, title)
+    print(f"[DEBUG] Shorts video created: {shorts_path}")
     return shorts_path
