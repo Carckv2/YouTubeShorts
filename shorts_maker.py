@@ -1,4 +1,5 @@
 import os
+os.environ["IMAGEMAGICK_BINARY"] = "/usr/bin/convert"
 import ffmpeg
 from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 from urllib.parse import urlparse, parse_qs
